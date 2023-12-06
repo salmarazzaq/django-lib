@@ -1,0 +1,12 @@
+{% extends 'base_generic.html' %}
+{% block content %}
+   
+  
+    <div class="bg bg-white">
+        {% for s in students %}
+            <ul>
+                <li><a href="{% url 'studentdetail' pk=s.id %}">{{ s.enrollment }}</li>
+            </ul>
+        {% endfor %} 
+    </div>
+{% endblock %}
