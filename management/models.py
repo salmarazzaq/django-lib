@@ -2,7 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse 
 from django.db.models.signals import post_save
-
+import datetime
+from django.utils import timezone
 
 
 class Book(models.Model):
@@ -13,7 +14,7 @@ class Book(models.Model):
                             help_text='13 Character <a href="https://www.isbn-international.org/content/what-isbn">ISBN number</a>')
     total_copies = models.IntegerField(null=True)
     available_copies = models.IntegerField(null=True)
-    issue_date = models.DateTimeField(null=True)
+    issue_date = models.DateTimeField(null=True,auto_now_add=True)
     pic=models.ImageField(blank=True, null=True, upload_to='book_image')
     def get_absolute_url(self):
         return reverse('bookdetail', args=[str(self.id)])
@@ -46,6 +47,7 @@ class Issue(models.Model):
     return_date = models.DateTimeField(null=True,blank=True)
     def __str__(self):
         return self.student.name+'issued'+self.book.title
+    
 class Reviews(models.Model):
     review = models.CharField( max_length=100 ,default="none")
     book = models.ForeignKey("Book", on_delete=models.CASCADE)

@@ -3,6 +3,7 @@ from .models import *
 from .forms import *
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 import datetime
 def index(request):
@@ -10,29 +11,7 @@ def index(request):
 def BookListView(request):
     booklist = Book.objects.all()
     return render(request,'management/booklist.html',{'booklist':booklist})
-@login_required
-def student_BookListView(request, book_id):
-    student = get_object_or_404(Student, user=request.user)
-    book = get_object_or_404(Book, pk=book_id)
 
-    # Check if the book is available for issuing (you may have additional conditions)
-    if not Issue.objects.filter(book=book, is_returned=False).exists():
-        # Book is available, create an issue record
-        issue = Issue.objects.create(student=student, book=book)
-        # You may want to add additional logic, like updating the book status, etc.
-
-        return render(request, 'management/issue_success.html', {'issue': issue})
-    else:
-        # Book is not available
-        return render(request, 'management/issue_failure.html', {'book': book})
-# def student_BookListView(request):
-#     student=Student.objects.get(enrollment=request.user)
-#     bor=Issue.objects.filter(student=student)
-#     book_list=[]
-#     for b in bor:
-#         book_list.append(b.book)
-   
-#     return render(request, 'management/booklist.html', {'student':student})
 def BookDetailview(request,pk):
     book = get_object_or_404(Book,id=pk)
     reviews=Reviews.objects.filter(book=book).exclude(review="none")
@@ -73,9 +52,18 @@ def BookDelete(request, pk):
     obj.delete()
     return redirect('index')
 
-
+def book_issue(request):
+    if not request.user.is_superuser:
+        return redirect('index')
+    form = IssueForm()
+    if request.method == 'POST':
+        form = IssueForm(data=request.POST, files=request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('book')
+    return render(request, 'management/form.html', locals())
 @login_required
-def student_request_issue(request, pk):
+def student_request_issue(request,pk ):
     obj = Book.objects.get(id=pk)
     stu=Student.objects.get(enrollment=request.user)
     s = get_object_or_404(Student, enrollment=str(request.user))
@@ -168,6 +156,34 @@ def RatingDelete(request, pk):
     pk = obj.book.id
     obj.delete()
     return redirect('bookdetail',pk)
+
+
+
+
+
+
+
+# def student_request_issue(request, pk):
+    # obj = Book.objects.get(id=pk)
+    # stu=Student.objects.get(enrollment=request.user)
+    # s = get_object_or_404(Student, enrollment=str(request.user))
+    # if s.total_books_due < 10:
+    #     message = "book has been isuued, You can collect book from library"
+    #     a = Issue()
+    #     a.student = s
+    #     a.book = obj
+    #     a.Issue_date= datetime.datetime.now()
+    #     obj.available_copies = obj.available_copies - 1
+    #     obj.save()
+    #     stu.total_books_due=stu.total_books_due+1
+    #     stu.save()
+    #     a.save()
+    # else:
+    #     message = "you have exceeded limit."
+    #     return redirect('booklist')
+    # return render(request, 'management/result.html', locals())
+
+
 
 
 

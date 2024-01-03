@@ -19,27 +19,25 @@ from django.contrib import admin
 from django.urls import path,include
 from .feed import LatestEntriesFeed
 from management import views
+
+
 urlpatterns = [
     
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
     path('book/', views.BookListView, name='book'),
-    path('student/booklist', views.student_BookListView, name='bookstudent'),
+    path('book/issue', views.book_issue, name='book_issue'),
+    path('book/<int:pk>/requestissue/', views.student_request_issue, name='requestissue'),
     path('book/<int:pk>', views.BookDetailview, name='bookdetail'),
     path('book/create/', views.BookCreate, name='bookcreate'),
     path('book/<int:pk>/update/', views.BookUpdate, name='bookupdate'),
     path('book/<int:pk>/delete/', views.BookDelete, name='bookdelete'),
-
     path('student/<int:pk>/delete/', views.StudentDelete, name='studentdelete'),
     path('student/create/', views.StudentCreate, name='studentcreate'),
     path('student<int:pk>/update/', views.StudentUpdate, name='studentupdate'),
     path('student/<int:pk>', views.StudentDetail, name='studentdetail'),
     path('student/', views.StudentList, name='studentlist'),
-    
-    path('book/<int:pk>/requestissue/', views.student_request_issue, name='requestissue'),
-
     path('feed/', LatestEntriesFeed(), name='feed'),
-    
     path('rating/<int:pk>/update/', views.RatingUpdate, name='ratingupdate'),
     path('rating/<int:pk>/delete/', views.RatingDelete, name='ratingdelete'),
    
@@ -48,9 +46,7 @@ urlpatterns += [
     path('accounts/', include('django.contrib.auth.urls')),
 
 ]
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL,
-                          document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
 

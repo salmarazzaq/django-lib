@@ -14,7 +14,6 @@ class IssueForm(forms.ModelForm):
         model = Issue
         exclude = ['issue_date', 'return_date']
 
-
 class StudentForm(forms.ModelForm):
     class Meta:
         model = Student
